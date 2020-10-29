@@ -1,2 +1,2 @@
-# epfu20W-102-A-amazons
+this is the project for amazons game for the EPFU tutorials
 
