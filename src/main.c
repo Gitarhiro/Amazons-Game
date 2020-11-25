@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>/*For Random seeding*/
 
 //These are dummy variables and functions for now, they will be properly implemented in the next stages
 
@@ -38,7 +39,17 @@ int main()
     scanf ("%d", &y);
     printf("\n");
 
-    //generateBoard(x, y);
+    int board[x][y][3];
+    srand(time(NULL));
+    
+    /*This generates the array*/
+    for (int d=0;d<x;d++) {
+        for (int e=0;e<y;e++) {
+            board[d][e][0] = rand() % 6;
+            board[d][e][1] = rand() % 4;
+            board[d][e][2] = 0;
+        }
+    }
     //printBoard();
 
     //Placement phase
