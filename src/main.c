@@ -50,7 +50,17 @@ int main()
             board[d][e][2] = 0;
         }
     }
-    //printBoard();
+    
+    /* This prints the board*/
+    for (int d=0;d<x;d++) {
+        printf("\n");
+        for (int e=0;e<y;e++) {
+            printf(" ");
+            for (int f=0;f<3;f++) {
+                printf("%d", board[d][e][f]);
+            }
+        }
+    }
 
     //Placement phase
 
