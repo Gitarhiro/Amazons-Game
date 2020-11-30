@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>/*For Random seeding*/
+#include <time.h>
+
+#include "placement.h"
+#include "movement.h"
 
 //These are dummy variables and functions for now, they will be properly implemented in the next stages
 
