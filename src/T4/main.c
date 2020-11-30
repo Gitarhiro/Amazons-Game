@@ -41,11 +41,11 @@ int main()
     printf ("y: ");
     scanf ("%d", &y);
     printf("\n");
-
+    
+    // Generate the array
     int board[x][y][3];
     srand(time(NULL));
-    
-    /*This generates the array*/
+
     for (int d=0;d<x;d++) {
         for (int e=0;e<y;e++) {
             board[d][e][0] = rand() % 6;
