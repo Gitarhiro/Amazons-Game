@@ -25,9 +25,17 @@ void printBoard (Tile **board, int x, int y)
     {
         for (int j = 0; j < y; j++)
         {
-            printf("%d", board[i][j].score);
-            printf("%d", board[i][j].artefact);
-            printf("%d ", board[i][j].occupation);
+            if (board[i][j].occupation == 0) {
+                printf("%c", 254);
+            }
+
+            else if (board[i][j].occupation == 9) {
+                printf("%c", 92);
+            }
+
+            else {
+                printf("%d", board[i][j].occupation);
+            }
         }
         printf("\n");
     }
