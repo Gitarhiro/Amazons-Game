@@ -37,6 +37,7 @@ int main()
     scanf ("%d", &size_y);
     printf("\n");
 
+    //Initializing the board array
     Tile **board;
     board = (Tile**) malloc(size_x  * sizeof(Tile));
     for (int i = 0; i < size_x; i++)
@@ -47,6 +48,16 @@ int main()
     srand(time(NULL));
 
     randomizeBoard(board, size_x, size_y);
+
+    typedef struct {
+        int player = 0;
+        int points = 0;
+    } Score;
+
+    //Initializing the Scoreboard
+    Score *scoreBoard;
+    scoreBoard = (Score*) malloc(/*numOfPlayers*/ 2 * sizeof(Score));
+
     printBoard(board, size_x, size_y);
 
     return 0;
