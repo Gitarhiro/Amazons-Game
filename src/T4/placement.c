@@ -13,7 +13,6 @@ void placement(Tile **board, int j){
         }
         else   printf("\nInvalid placement. Try again.\n")
     }
-    //THING TO BE MADE FOR THE NEXT TUTORIALS IS TO CHECK THE TYPE OF DATA IMPUT IN THE PLACEMENT//
     
 }
 
