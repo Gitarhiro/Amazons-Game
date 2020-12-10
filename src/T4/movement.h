@@ -8,9 +8,8 @@
     y           stores value of heigth of the board
     numOfTiles  stores value of how many tiles the player wants to move his amazon
     direction   stores name of direction in which the amazon will be moved
-    score       an array which stores the values of each player's score
-    board       a 3-dimentional array storing the board
+    board       a structure
 
 */
-void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], int *score, int *board)
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board)
 
