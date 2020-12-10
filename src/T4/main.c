@@ -3,7 +3,7 @@
 #include <time.h>
 #include "Board.h"
 #include "placement.h"
-
+#include "movement.h"
 
 int numOfPlayers, numOfAmazons, size_x, size_y, x, y, numOfTiles;
 char direction[15];
@@ -13,9 +13,9 @@ int main()
 {
     printf("\n");
     printf("-WELCOME TO THE GAME OF AMAZONS-\n\n");
-    //Input of the number of amazons and players
+    Input of the number of amazons and players
 
-    /*
+    
     printf("Input the number of players\n");
     scanf("%d", &numOfPlayers);
 
@@ -57,7 +57,7 @@ int main()
 
     //Initializing the Scoreboard
     Score *scoreBoard;
-    scoreBoard = (Score*) malloc(/*numOfPlayers*/ 2 * sizeof(Score));
+    scoreBoard = (Score*) malloc(numOfPlayers * sizeof(Score));
 
     printBoard(board, size_x, size_y);
 
