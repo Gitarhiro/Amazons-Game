@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "Board.h"
+#include "placement.h"
 
 
 int numOfPlayers, numOfAmazons, size_x, size_y, x, y, numOfTiles;
@@ -59,6 +60,16 @@ int main()
     scoreBoard = (Score*) malloc(/*numOfPlayers*/ 2 * sizeof(Score));
 
     printBoard(board, size_x, size_y);
+
+    /* PLACEMENT PHASE */
+    for(int i = 0; i < numOfAmazons; i++) {
+        printf("%d amazons left");
+        for(int j = 0; j < numOfPlayers; j++) {
+            printf("Turn of player number %d" , (j+1));
+            placement(board , j);
+            printBoard(board , size_x, size_y);
+        }
+    }
 
     return 0;
 }
