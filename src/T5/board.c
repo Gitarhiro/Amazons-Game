@@ -1,87 +1,82 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string.h>
 #include "board.h"
+#include "movement.h"
 
-void randomizeBoard (Tile **board, int x)
-{
-    for (int i = 0; i < x; i++)
+int main() {
+    //Declaration of all variables
+    int numOfPlayers, numOfAmazons, size_x, x, y, numOfTiles;
+
+    //Title
+    printf("\n-WELCOME TO THE GAME OF AMAZONS-\n\n");
+
+    //Inputing the number of players
+    printf("Input the number of players\n");
+    scanf("%d", &numOfPlayers);
+
+    //Inputing the Player names
+    char name[numOfPlayers][11];
+    for(int i = 1; i <= numOfPlayers; i++)
     {
-        for (int j = 0; j < x; j++)
-        {
-            board[i][j].score = rand() % 6;
-            board[i][j].artefact = rand() % 4;
-            board[i][j].occupation = 0;
-        }
-    }
-}
-
-void placement(Tile **board, int j, int dimensions){
-    int x,y,r;
-    while (1) {
-        r=0;
-        while (r==0) {
-        printf("\nx: ");
-        r=scanf("%d" ,&x);
-        if(r==0 || x < 0 || x > dimensions ) 
-        {
-            printf("Wrong input, give another positive number in the range: \n");
-            r=0;
-        }
-        while(getchar()!='\n');
-    }
-    r=0;
-    while (r==0) {
-        printf("\ny: ");
-        r=scanf("%d" ,&y);
-        if(r==0 || y < 0 || y > dimensions ) 
-        {
-            printf("Wrong input, give another positive number in the range: \n");
-            r=0;
-        }
-        while(getchar()!='\n');
-    }
-        
-        if(board[x][y].occupation == 0) {
-            board[x][y].occupation = j;
-            break;
-        }
-        else printf("\nInvalid placement. Try again.\n");
-    }    
-}
-
-void printBoard(Tile **board, int x)
-{
-    printf("    ");
-
-    for (int k = 0; k < x; k++) {
-        printf("%d ", k);
+        printf("Enter Player %d's name (max. 12 characters)\n", i);
+        scanf("%s", name[i]);
     }
 
-    printf("\n    ");
+    //Inputting the number of Amazons per player
+    printf("Input the number of amazons for each player\n");
+    scanf("%d", &numOfAmazons);
 
-    for (int k = 0; k < x; k++) {
-        printf("- ");
-    }
-
+    //Inputing the board dimensions
+    printf("Input the board size\n");
+    scanf ("%d", &size_x);
     printf("\n");
 
-    for (int i = 0; i < x; i++) {
-        printf("%d | ", i);
-        for (int j = 0; j < x; j++)
-        {
-            if (board[i][j].occupation == 0) {
-                printf("%c", 254);
-            }
-
-            else if (board[i][j].occupation == 9) {
-                printf("%c", 92);
-            }
-
-            else {
-                printf("%d", board[i][j].occupation);
-            }
-            printf(" ");
-        }
-        printf("\n");
+    //Initializing the board array
+    Tile **board;
+    board = (Tile**) malloc(size_x  * sizeof(Tile));
+    for (int i = 0; i < size_x; i++)
+    {
+        board[i] = (Tile*) malloc(size_x * sizeof(Tile));
     }
+
+    //Randomizing the board array
+    srand(time(NULL));
+    randomizeBoard(board, size_x);
+
+    //Initializing the Scoreboard
+    Score *scoreBoard;
+    scoreBoard = (Score*) malloc(numOfPlayers * sizeof(Score));
+
+    printBoard(board, size_x);
+
+    //Placement Phase
+    for (int i = 0; i < numOfAmazons; i++) {
+        printf("%d amazons left to deploy\n");
+        for (int j = 0; j < numOfPlayers; j++) {
+            printf("Turn of player number %d" , (j+1));
+            placement(board , j+1, size_x);
+            printBoard(board , size_x);
+        }
+    }
+
+    printf("\n\n");
+    
+    //Movement Phase
+        for (int i = 0; i < numOfPlayers; i++) {
+            printf("Turn of player number %d\n" , i+1);
+            
+            for (int j = 0; j < numOfAmazons; j++) {
+                printf("%d amazon(s) left to move\n", numOfAmazons - j);
+            }
+
+            if (i == numOfPlayers) {
+                i = 0;
+            }
+
+            printf("\n");
+        }
+
+return 0;
 }
