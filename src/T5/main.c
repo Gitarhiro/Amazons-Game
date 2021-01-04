@@ -53,7 +53,7 @@ int main() {
 
     //Placement Phase
     for (int i = 0; i < numOfAmazons; i++) {
-        printf("%d amazons left to deploy\n");
+        printf("%d amazons left to deploy\n" , (numOfAmazons - i ));
         for (int j = 0; j < numOfPlayers; j++) {
             printf("Turn of player number %d" , (j+1));
             placement(board , j+1, size_x);
