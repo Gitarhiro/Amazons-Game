@@ -14,6 +14,10 @@ typedef struct {
         int points;
     } Score;
 
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board);
+void usingArtifact(int player_id, int x, int y, Tile **board);
+void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board);
+
 void randomizeBoard (Tile **board, int x)
 {
     for (int i = 0; i < x; i++)
@@ -101,91 +105,327 @@ void printBoard(Tile **board, int x)
     printf("\n");
 }
 
-void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board) {
+int isMovementPossible(int x, int y, Tile **board)
+{
+    if(board[x][y].occupation == 0)
+    {
+        return 1;
+    }
+    return 0;
+}
 
-    //moving an amazon to a different tile
+void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
+{
+    //id = 1    arrow
+    //id = 2    spear
+
+    int valid = 1;
+    int x_axis;
+    int y_axis;
+    
+    //checking if shot is possible
     if(strcmp(direction, "LEFT")==0)
     {
-        if(board[x][y - numOfTiles].occupation == 0)
-        {
-            board[x][y].occupation = 0;
-            board[x][y - numOfTiles].occupation = player_id;
-        } //checking if the tile an amazon want to move to is unoccupied
-        else
-            printf("Move is invalid.\n");
+        x_axis = 0;
+        y_axis = -numOfTiles;
 
-        //using artefact
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x, y - i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
     }
     else if(strcmp(direction, "RIGHT")==0)
     {
-        if(board[x][y + numOfTiles].occupation == 0)
+        x_axis = 0;
+        y_axis = numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;                                
-            board[x][y + numOfTiles].occupation = player_id;
+            if(isMovementPossible(x, y + i, board) == 0)
+            {
+                valid = 0;
+            }
         }
-        else
-            printf("Move is invalid.\n");
     }
     else if(strcmp(direction, "UP")==0)
     {
-        if(board[x - numOfTiles][y].occupation == 0)
+        x_axis = -numOfTiles;
+        y_axis = 0;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;                         
-            board[x - numOfTiles][y].occupation = player_id;
-        }    
-        else
-            printf("Move is invalid.\n");
+            if(isMovementPossible(x - i, y, board) == 0)
+            {
+                valid = 0;
+            }
+        }
     }
     else if(strcmp(direction, "DOWN")==0)
     {
-        if(board[x + numOfTiles][y].occupation == 0)
+        x_axis = numOfTiles;
+        y_axis = 0;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;                                  
-            board[x + numOfTiles][y].occupation = player_id;
+            if(isMovementPossible(x + i, y, board) == 0)
+            {
+                valid = 0;
+            }
         }
-        else
-            printf("Move is invalid.\n");
     }
     else if(strcmp(direction, "UPLEFT")==0)
     {
-        if(board[x - numOfTiles][y - numOfTiles].occupation == 0)
+        x_axis = -numOfTiles;
+        y_axis = -numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;
-            board[x - numOfTiles][y - numOfTiles].occupation = player_id;
-        }                                
-        else
-            printf("Move is invalid.\n");
+            if(isMovementPossible(x - i, y - i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
     }
     else if(strcmp(direction, "DOWNLEFT")==0)
     {
-        if(board[x + numOfTiles][y - numOfTiles].occupation == 0)
+        x_axis = numOfTiles;
+        y_axis = -numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;                            
-            board[x + numOfTiles][y - numOfTiles].occupation = player_id;
+            if(isMovementPossible(x + i, y - i, board) == 0)
+            {
+                valid = 0;
+            }
         }
-        else
-            printf("Move is invalid.\n");
     }
     else if(strcmp(direction, "UPRIGHT")==0)
     {
-        if(board[x - numOfTiles][y + numOfTiles].occupation == 0)
+        x_axis = -numOfTiles;
+        y_axis = numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;                                  
-            board[x - numOfTiles][y + numOfTiles].occupation = player_id;
+            if(isMovementPossible(x - i, y + i, board) == 0)
+            {
+                valid = 0;
+            }
         }
-        else
-            printf("Move is invalid.\n");
     }
     else if(strcmp(direction, "DOWNRIGHT")==0)
     {
-        if(board[x + numOfTiles][y + numOfTiles].occupation == 0)
+        x_axis = numOfTiles;
+        y_axis = numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
         {
-            board[x][y].occupation = 0;
-            board[x + numOfTiles][y + numOfTiles].occupation = player_id;
-        }                                
-        else
-            printf("Move is invalid.\n");
+            if(isMovementPossible(x + i, y + i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
     }
+
+    if(id == 2 && board[x + x_axis][y + y_axis].occupation == 0)
+    {
+        board[x + x_axis][y + y_axis].occupation = 9;
+        printf("Amazon shot a spear.\n");
+    }
+    else if(valid == 1)
+    {
+        board[x + x_axis][y + y_axis].occupation = 9;
+        printf("Amazon shot an arrow.\n");
+    }
+    else
+    {
+        printf("Shot is invalid.\n");
+    }
+}
+
+void usingArtifact(int player_id, int x, int y, Tile **board)
+{
+    if(board[x][y].artefact == 0)
+    {
+        printf("There is no artifact. Shoot an arrow now.\n");
+        
+        //shooting an arrow
+        int num;
+        char direction[15];
+
+        printf("Number of tiles you want to shoot an arrow: ");
+        scanf("%d", &num);
+        printf("Enter the direction: ");
+        scanf("%s", &direction);
+
+        shoot(1, x, y, num, direction, board);
+    }
+    else if(board[x][y].artefact == 1)
+    {
+        //horse
+        printf("Amazon found a horse, make a move.\n");
+
+        int num;
+        char direction[15];
+
+        printf("Number of tiles the amazon will move: ");
+        scanf("%d", &num);
+        printf("Enter the direction: ");
+        scanf("%s", &direction);
+
+        moveAmazon(player_id, x, y, num, direction, board);
+    }
+    else if(board[x][y].artefact == 2)
+    {
+        //broken arrow
+        printf("Amazon found a broken arrow and it cannot shoot.\n");
+    }
+    else
+    {
+        //spear
+        printf("Amazon found a spear. Shoot a spear now.\n");
+
+        int num;
+        char direction[15];
+
+        printf("Number of tiles you want to shoot a spear: ");
+        scanf("%d", &num);
+        printf("Enter the direction: ");
+        scanf("%s", &direction);
+
+        shoot(2, x, y, num, direction, board);
+    }
+    
+}
+
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board) 
+{
+
+    int valid = 1;
+    int x_axis;
+    int y_axis;
+    
+    //checking if movement is possible
+    if(strcmp(direction, "LEFT")==0)
+    {
+        x_axis = 0;
+        y_axis = -numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x, y - i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "RIGHT")==0)
+    {
+        x_axis = 0;
+        y_axis = numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x, y + i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "UP")==0)
+    {
+        x_axis = -numOfTiles;
+        y_axis = 0;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x - i, y, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "DOWN")==0)
+    {
+        x_axis = numOfTiles;
+        y_axis = 0;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x + i, y, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "UPLEFT")==0)
+    {
+        x_axis = -numOfTiles;
+        y_axis = -numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x - i, y - i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "DOWNLEFT")==0)
+    {
+        x_axis = numOfTiles;
+        y_axis = -numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x + i, y - i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "UPRIGHT")==0)
+    {
+        x_axis = -numOfTiles;
+        y_axis = numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x - i, y + i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+    else if(strcmp(direction, "DOWNRIGHT")==0)
+    {
+        x_axis = numOfTiles;
+        y_axis = numOfTiles;
+
+        for(int i = 1; i <= numOfTiles; i++)
+        {
+            if(isMovementPossible(x + i, y + i, board) == 0)
+            {
+                valid = 0;
+            }
+        }
+    }
+
+    if(valid == 1)
+    {
+        board[x][y].occupation = 0;
+        board[x + x_axis][y + y_axis].occupation = player_id;
+
+        //using artefact
+        usingArtifact(player_id, x + x_axis, y + y_axis, board);
+    }
+    else
+    {
+        printf("Move is invalid.\n");
+    }
+
 }
 
 
