@@ -428,6 +428,11 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
 
 }
 
+void printScore(int numOfPlayers, char **name[numOfPlayers][11], Score *scoreBoard[numOfPlayers]) {
+    for (int i = 0; i < numOfPlayers; i++) {
+        printf("%s : %d points\n", name[i], scoreBoard[i]);
+    }
+}
 
 int main() 
 {
