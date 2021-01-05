@@ -276,11 +276,13 @@ void usingArtifact(int player_id, int x, int y, Tile **board)
         scanf("%s", &direction);
 
         moveAmazon(player_id, x, y, num, direction, board);
+        board[x][y].artefact = 0;
     }
     else if(board[x][y].artefact == 2)
     {
         //broken arrow
         printf("Amazon found a broken arrow and it cannot shoot.\n");
+        board[x][y].artefact = 0;
     }
     else
     {
@@ -296,6 +298,7 @@ void usingArtifact(int player_id, int x, int y, Tile **board)
         scanf("%s", &direction);
 
         shoot(2, x, y, num, direction, board);
+        board[x][y].artefact = 0;
     }
     
 }
