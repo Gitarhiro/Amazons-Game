@@ -7,6 +7,7 @@ typedef struct {
     int score;
     int artefact;
     int occupation;
+    int moved;
     } Tile;
 
 typedef struct {
@@ -14,9 +15,9 @@ typedef struct {
         int points;
     } Score;
 
-void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board);
-void usingArtifact(int player_id, int x, int y, Tile **board);
-void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board);
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size);
+void usingArtifact(int player_id, int x, int y, Tile **board, int size);
+void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board, int size);
 
 void randomizeBoard (Tile **board, int x)
 {
@@ -27,6 +28,7 @@ void randomizeBoard (Tile **board, int x)
             board[i][j].score = rand() % 6;
             board[i][j].artefact = rand() % 4;
             board[i][j].occupation = 0;
+            board[i][j].moved = 0;
         }
     }
 }
@@ -60,12 +62,82 @@ void placement(Tile **board, int j, int dimensions)
         
         if(board[y][x].occupation == 0) {
             board[y][x].occupation = j;
+            board[y][x].artefact = 0;
+            board[y][x].score = 0;
             break;
         }
 
         else printf("\nInvalid placement. Try again.\n");
     }    
 }
+
+int isAmazonAvaiable(int x, int y, Tile **board, int size)
+{   
+    size--;
+
+    if(board[y][x].moved == 1)
+        return 0;
+
+    if(x == 0) {
+        if(y == 0) {
+            if (board[y+1][x+1].occupation != 0 && board[y+1][x].occupation != 0 && board[y][x+1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+        }
+        else if (y == size) {
+            if (board[y-1][x+1].occupation != 0 && board[y-1][x].occupation != 0 && board[y][x+1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+        }
+        else if (board[y+1][x+1].occupation != 0 && board[y][x+1].occupation != 0 && board[y-1][x+1].occupation != 0 && board[y+1][x].occupation != 0 && board[y-1][x].occupation != 0) {
+                return 0;
+            }
+            return 1;
+    }
+    if(x == size) {
+        if(y == 0) {
+            if (board[y+1][x-1].occupation != 0 && board[y+1][x].occupation != 0 && board[y][x-1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+        }
+        else if (y == size) {
+             if (board[y-1][x-1].occupation != 0 && board[y-1][x].occupation != 0 && board[y][x-1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+        }
+        else if (board[y+1][x-1].occupation != 0 && board[y+1][x].occupation != 0 && board[y][x-1].occupation != 0 && board[y-1][x-1].occupation != 0 && board[y-1][x].occupation != 0) {
+                return 0;
+            }
+            return 1;
+    }
+    if(y == 0) {
+        if(x != 0 && x != size) {
+            if (board[y][x-1].occupation != 0 && board[y+1][x-1].occupation != 0 && board[y][x+1].occupation != 0 && board[y+1][x+1].occupation != 0 && board[y][x+1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+        }
+        
+    }
+    if(y == size) {
+        if(x != 0 && x != size) {
+            if (board[y][x-1].occupation != 0 && board[y-1][x-1].occupation != 0 && board[y-1][x].occupation != 0 && board[y-1][x+1].occupation != 0 && board[y][x+1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+        } 
+    }
+    else if (board[y+1][x-1].occupation != 0 && board[y+1][x].occupation != 0 && board[y+1][x+1].occupation != 0 && board[y][x+1].occupation != 0 && board[y-1][x+1].occupation != 0 && board[y-1][x].occupation != 0 && board[y-1][x-1].occupation != 0 && board[y][x-1].occupation != 0) {
+                return 0;
+            }
+            return 1;
+   
+}
+
 
 void printBoard(Tile **board, int x)
 {
@@ -114,12 +186,13 @@ int isMovementPossible(int x, int y, Tile **board)
     return 0;
 }
 
-void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
+void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board, int size)
 {
     //id = 1    arrow
     //id = 2    spear
 
     int valid = 1;
+    int inBoundaries = 1;
     int x_axis;
     int y_axis;
     
@@ -129,24 +202,42 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
         x_axis = 0;
         y_axis = -numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (y - numOfTiles < 0)
         {
-            if(isMovementPossible(x, y - i, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x, y - i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
+        
+        
     }
     else if(strcmp(direction, "RIGHT")==0)
     {
         x_axis = 0;
         y_axis = numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (y + numOfTiles > size)
         {
-            if(isMovementPossible(x, y + i, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x, y + i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -154,12 +245,20 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
     {
         x_axis = -numOfTiles;
         y_axis = 0;
-
-        for(int i = 1; i <= numOfTiles; i++)
+        
+        if (x - numOfTiles < 0)
         {
-            if(isMovementPossible(x - i, y, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x - i, y, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -168,11 +267,19 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
         x_axis = numOfTiles;
         y_axis = 0;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x + numOfTiles > size)
         {
-            if(isMovementPossible(x + i, y, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x + i, y, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -181,11 +288,19 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
         x_axis = -numOfTiles;
         y_axis = -numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x - numOfTiles < 0 || y - numOfTiles < 0)
         {
-            if(isMovementPossible(x - i, y - i, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x - i, y - i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -194,11 +309,19 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
         x_axis = numOfTiles;
         y_axis = -numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x + numOfTiles > size || y - numOfTiles < 0)
         {
-            if(isMovementPossible(x + i, y - i, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x + i, y - i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -207,11 +330,19 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
         x_axis = -numOfTiles;
         y_axis = numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x - numOfTiles < 0 || y + numOfTiles > size)
         {
-            if(isMovementPossible(x - i, y + i, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x - i, y + i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -220,38 +351,84 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board)
         x_axis = numOfTiles;
         y_axis = numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x + numOfTiles > size || y + numOfTiles > size)
         {
-            if(isMovementPossible(x + i, y + i, board) == 0)
+            inBoundaries = 0;
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x + i, y + i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
-
-    if(id == 2 && board[x + x_axis][y + y_axis].occupation == 0)
+    else
+    {
+        valid = 0;
+    }
+    
+    if(id == 2 && board[x + x_axis][y + y_axis].occupation == 0 && inBoundaries)
     {
         board[x + x_axis][y + y_axis].occupation = 9;
         printf("Amazon shot a spear.\n");
     }
-    else if(valid == 1)
+    else if(valid)
     {
         board[x + x_axis][y + y_axis].occupation = 9;
         printf("Amazon shot an arrow.\n");
     }
     else
     {
-        printf("Shot is invalid.\n");
+        printf("Shot is invalid. Make the shot again.\n");
+        printBoard(board , size);
+        int num;
+        char direction[15];
+
+        printf("Number of tiles you want to shoot a spear or an arrow: ");
+        scanf("%d", &num);
+        printf("Enter the direction: ");
+        scanf("%s", &direction);
+
+        shoot(id, x, y, num, direction, board, size);
     }
 }
 
-void usingArtifact(int player_id, int x, int y, Tile **board)
+void usingArtifact(int player_id, int x, int y, Tile **board, int size)
 {
     if(board[x][y].artefact == 0)
     {
         printf("There is no artifact. Shoot an arrow now.\n");
         
         //shooting an arrow
+        if (isAmazonAvaiable(x, y, board, size))
+        {
+            int num;
+            char direction[15];
+
+            printf("Number of tiles you want to shoot an arrow: ");
+            scanf("%d", &num);
+            printf("Enter the direction: ");
+            scanf("%s", &direction);
+
+            shoot(1, x, y, num, direction, board, size);
+        }
+        
+        else
+        {
+            printf("The amazon is blocked. It cannot shoot an arrow.\n");
+        }
+        
+    }
+    else if(board[x][y].artefact == 1)
+    {
+        //horse
+        printf("Amazon found a horse, shoot an arrow and make a move.\n");
+
         int num;
         char direction[15];
 
@@ -260,22 +437,17 @@ void usingArtifact(int player_id, int x, int y, Tile **board)
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        shoot(1, x, y, num, direction, board);
-    }
-    else if(board[x][y].artefact == 1)
-    {
-        //horse
-        printf("Amazon found a horse, make a move.\n");
+        shoot(1, x, y, num, direction, board, size);
 
-        int num;
-        char direction[15];
+        printBoard(board, size);
 
+        printf("Time for another move\n");
         printf("Number of tiles the amazon will move: ");
         scanf("%d", &num);
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        moveAmazon(player_id, x, y, num, direction, board);
+        moveAmazon(player_id, x, y, num, direction, board, size);
         board[x][y].artefact = 0;
     }
     else if(board[x][y].artefact == 2)
@@ -297,13 +469,13 @@ void usingArtifact(int player_id, int x, int y, Tile **board)
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        shoot(2, x, y, num, direction, board);
+        shoot(2, x, y, num, direction, board, size);
         board[x][y].artefact = 0;
     }
     
 }
 
-void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board) 
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size) 
 {
 
     int valid = 1;
@@ -316,11 +488,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = 0;
         y_axis = -numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (y - numOfTiles < 0)
         {
-            if(isMovementPossible(x, y - i, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x, y - i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -329,11 +508,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = 0;
         y_axis = numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (y + numOfTiles > size)
         {
-            if(isMovementPossible(x, y + i, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x, y + i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -341,12 +527,19 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
     {
         x_axis = -numOfTiles;
         y_axis = 0;
-
-        for(int i = 1; i <= numOfTiles; i++)
+        
+        if (x - numOfTiles < 0)
         {
-            if(isMovementPossible(x - i, y, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x - i, y, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -355,11 +548,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = numOfTiles;
         y_axis = 0;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x + numOfTiles > size)
         {
-            if(isMovementPossible(x + i, y, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x + i, y, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -368,11 +568,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = -numOfTiles;
         y_axis = -numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x - numOfTiles < 0 || y - numOfTiles < 0)
         {
-            if(isMovementPossible(x - i, y - i, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x - i, y - i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -381,11 +588,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = numOfTiles;
         y_axis = -numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x + numOfTiles > size || y - numOfTiles < 0)
         {
-            if(isMovementPossible(x + i, y - i, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x + i, y - i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -394,11 +608,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = -numOfTiles;
         y_axis = numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x - numOfTiles < 0 || y + numOfTiles > size)
         {
-            if(isMovementPossible(x - i, y + i, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x - i, y + i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
     }
@@ -407,28 +628,72 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         x_axis = numOfTiles;
         y_axis = numOfTiles;
 
-        for(int i = 1; i <= numOfTiles; i++)
+        if (x + numOfTiles > size || y + numOfTiles > size)
         {
-            if(isMovementPossible(x + i, y + i, board) == 0)
+            valid = 0;
+        }
+        else
+        {
+            for(int i = 1; i <= numOfTiles; i++)
             {
-                valid = 0;
+                if(isMovementPossible(x + i, y + i, board) == 0)
+                {
+                    valid = 0;
+                }
             }
         }
+    }
+    else
+    {
+        valid = 0;
     }
 
     if(valid == 1)
     {
         board[x][y].occupation = 0;
         board[x + x_axis][y + y_axis].occupation = player_id;
-
+        board[x + x_axis][y + y_axis].moved = 1;
+        board[x][y].moved = 0;
+        printBoard(board , size);
         //using artefact
-        usingArtifact(player_id, x + x_axis, y + y_axis, board);
+        usingArtifact(player_id, x + x_axis, y + y_axis, board, size);
     }
     else
     {
-        printf("Move is invalid.\n");
+        printf("Move is invalid. Make the move again.\n");
+        printBoard(board , size);
+        int num;
+        char direction[15];
+        printf("Number of tiles the amazon will move: ");
+        scanf("%d", &num);
+        printf("Enter the direction: ");
+        scanf("%s", &direction);
+
+        moveAmazon(player_id, x, y, num, direction, board, size);
     }
 
+}
+
+int availableAmazons(int player_id, Tile **board, int size)
+{
+    int freeAmazons = 0;
+
+    for (int y = 0; y < size; y++)
+        for (int x = 0; x < size; x++)
+            if (board[y][x].occupation == player_id)
+                if (isAmazonAvaiable(x, y, board, size))
+                    freeAmazons++;
+    
+    return freeAmazons;
+}
+
+int endGameCheck(int playerCanMove[], int players)
+{
+    for (int id = 0; id < players; id++)
+        if (playerCanMove[id] > 0)
+            return 1;
+    
+    return 0;
 }
 
 void printScore(int numOfPlayers, char **name[numOfPlayers][11], Score *scoreBoard[numOfPlayers]) {
@@ -437,7 +702,14 @@ void printScore(int numOfPlayers, char **name[numOfPlayers][11], Score *scoreBoa
     }
 }
 
-int main() 
+void newMove(Tile **board, int size)
+{
+    for (int x = 0; x < size; x++)
+        for (int y = 0; y < size; y++)
+            board[x][y].moved = 0;
+}
+
+int main()
 {
     //Declaration of all variables
     int numOfPlayers, numOfAmazons, size, x, y, numOfTiles;
@@ -471,9 +743,7 @@ int main()
     Tile **board;
     board = (Tile**) malloc(size  * sizeof(Tile));
     for (int i = 0; i < size; i++) 
-    {
         board[i] = (Tile*) malloc(size * sizeof(Tile));
-    }
 
     //Randomizing the board array
     srand(time(NULL));
@@ -500,44 +770,60 @@ int main()
 
     //Movement Phase
 
-    int movesAvailable = 1;
+    int playersAvailableAmazons[numOfPlayers];
 
-    while (movesAvailable)
+    for (int id = 0; id < numOfPlayers; id++)
+        playersAvailableAmazons[id] = availableAmazons(id+1, board, size);
+
+    while (endGameCheck(playersAvailableAmazons, numOfPlayers))
     {
         for (int i = 0; i < numOfPlayers; i++) 
         {
-            printf("Turn of %s\n" , name[i]);
-            printf("Enter the coordinates of the amazon you want to move\n");
-            printf("x: ");
-            scanf("%d", &x);
-            printf("y: ");
-            scanf("%d", &y);
-
-            while (board[y][x].occupation != i+1) //error check
+            newMove(board, size);
+            while (playersAvailableAmazons[i])
             {
-                printf("Your amazon is not on given tile. Input the coordinates again\n");
+                printf("Turn of %s\n" , name[i]);
+                
+                printf("Enter the coordinates of the amazon you want to move\n");
                 printf("x: ");
                 scanf("%d", &x);
                 printf("y: ");
                 scanf("%d", &y);
-            }
+                
+                int canMove = isAmazonAvaiable(x, y, board, size);
+
+                while (board[y][x].occupation != i+1 || !canMove) //error check
+                {
+                    printf("Your amazon is not on given tile or cannot move. Input the coordinates again\n");
+                    printf("x: ");
+                    scanf("%d", &x);
+                    printf("y: ");
+                    scanf("%d", &y);
+
+                    canMove = isAmazonAvaiable(x, y, board, size);
+                }
             
-            int num;
-            char direction[15];
-            printf("Number of tiles the amazon will move: ");
-            scanf("%d", &num);
-            printf("Enter the direction: ");
-            scanf("%s", &direction);
+                int num;
+                char direction[15];
+                printf("Number of tiles the amazon will move: ");
+                scanf("%d", &num);
+                printf("Enter the direction: ");
+                scanf("%s", &direction);
 
-            moveAmazon(i+1, y, x, num, direction, board);
+                moveAmazon(i+1, y, x, num, direction, board, size);
 
-            printBoard(board , size);
+                printBoard(board , size);
 
-            printf("\n");
+                for (int id = 0; id < numOfPlayers; id++)
+                    playersAvailableAmazons[id] = availableAmazons(id+1, board, size);
+                    
+                printf("\n");
+            }
         }
     }
     
+    printf("---GAME OVER---\n");
     
     getchar();
-    return 0;
+    return 1;
 }
