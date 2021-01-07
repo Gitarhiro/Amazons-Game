@@ -656,7 +656,7 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
     {
         board[x][y].occupation = 0;
         board[x + x_axis][y + y_axis].occupation = player_id;
-        scoreBoard[player_id].points += board[x + x_axis][y + y_axis].score;
+        scoreBoard[player_id - 1].points += board[x + x_axis][y + y_axis].score;
         board[x + x_axis][y + y_axis].score = 0;
         board[x + x_axis][y + y_axis].moved = 1;
         board[x][y].moved = 0;
