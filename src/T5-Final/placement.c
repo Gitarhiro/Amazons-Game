@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "board.h"
+#include "placement.h"
 
 void randomizeBoard (Tile **board, int x)
 {
@@ -11,11 +9,13 @@ void randomizeBoard (Tile **board, int x)
             board[i][j].score = rand() % 6;
             board[i][j].artefact = rand() % 4;
             board[i][j].occupation = 0;
+            board[i][j].moved = 0;
         }
     }
 }
 
-void placement(Tile **board, int j, int dimensions){
+void placement(Tile **board, int j, int dimensions)
+{
     int x,y,r;
 
     while (1) {
@@ -41,48 +41,13 @@ void placement(Tile **board, int j, int dimensions){
             while(getchar()!='\n');
         }
         
-        if(board[x][y].occupation == 0) {
-            board[x][y].occupation = j;
+        if(board[y][x].occupation == 0) {
+            board[y][x].occupation = j;
+            board[y][x].artefact = 0;
+            board[y][x].score = 0;
             break;
         }
 
         else printf("\nInvalid placement. Try again.\n");
     }    
-}
-
-void printBoard(Tile **board, int x)
-{
-    printf("    ");
-
-    for (int k = 0; k < x; k++) {
-        printf("%d ", k);
-    }
-
-    printf("\n    ");
-
-    for (int k = 0; k < x; k++) {
-        printf("- ");
-    }
-
-    printf("\n");
-
-    for (int i = 0; i < x; i++) {
-        printf("%d | ", i);
-        for (int j = 0; j < x; j++)
-        {
-            if (board[i][j].occupation == 0) {
-                printf("%c", 254);
-            }
-
-            else if (board[i][j].occupation == 9) {
-                printf("%c", 92);
-            }
-
-            else {
-                printf("%d", board[i][j].occupation);
-            }
-            printf(" ");
-        }
-        printf("\n");
-    }
 }
