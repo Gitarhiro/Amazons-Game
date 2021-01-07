@@ -15,12 +15,11 @@ typedef struct {
         int points;
     } Score;
 
-void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size);
-void usingArtifact(int player_id, int x, int y, Tile **board, int size);
-void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board, int size);
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers]);
+void usingArtifact(int player_id, int x, int y, Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers]);
+void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers]);
 
-void randomizeBoard (Tile **board, int x)
-{
+void randomizeBoard (Tile **board, int x) {
     for (int i = 0; i < x; i++)
     {
         for (int j = 0; j < x; j++)
@@ -139,7 +138,7 @@ int isAmazonAvaiable(int x, int y, Tile **board, int size)
 }
 
 
-void printBoard(Tile **board, int x)
+void printBoard(Tile **board, int x, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers])
 {
     printf("    ");
 
@@ -175,6 +174,11 @@ void printBoard(Tile **board, int x)
         printf("\n");
     }
     printf("\n");
+
+    for (int i = 0; i < numOfPlayers; i++) {
+        printf("%s : %d points\n", name[i], scoreBoard[i].points);
+    }
+    printf("\n");
 }
 
 int isMovementPossible(int x, int y, Tile **board)
@@ -186,7 +190,7 @@ int isMovementPossible(int x, int y, Tile **board)
     return 0;
 }
 
-void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board, int size)
+void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers])
 {
     //id = 1    arrow
     //id = 2    spear
@@ -385,7 +389,7 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board,
     else
     {
         printf("Shot is invalid. Make the shot again.\n");
-        printBoard(board , size);
+        printBoard(board, size, numOfPlayers, name, scoreBoard);
         int num;
         char direction[15];
 
@@ -394,11 +398,11 @@ void shoot(int id, int x, int y, int numOfTiles, char direction[], Tile **board,
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        shoot(id, x, y, num, direction, board, size);
+        shoot(id, x, y, num, direction, board, size, numOfPlayers, name, scoreBoard);
     }
 }
 
-void usingArtifact(int player_id, int x, int y, Tile **board, int size)
+void usingArtifact(int player_id, int x, int y, Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers])
 {
     if(board[x][y].artefact == 0)
     {
@@ -415,7 +419,7 @@ void usingArtifact(int player_id, int x, int y, Tile **board, int size)
             printf("Enter the direction: ");
             scanf("%s", &direction);
 
-            shoot(1, x, y, num, direction, board, size);
+            shoot(1, x, y, num, direction, board, size, numOfPlayers, name, scoreBoard);
         }
         
         else
@@ -437,9 +441,9 @@ void usingArtifact(int player_id, int x, int y, Tile **board, int size)
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        shoot(1, x, y, num, direction, board, size);
+        shoot(1, x, y, num, direction, board, size, numOfPlayers, name, scoreBoard);
 
-        printBoard(board, size);
+        printBoard(board, size, numOfPlayers, name, scoreBoard);
 
         printf("Time for another move\n");
         printf("Number of tiles the amazon will move: ");
@@ -447,7 +451,7 @@ void usingArtifact(int player_id, int x, int y, Tile **board, int size)
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        moveAmazon(player_id, x, y, num, direction, board, size);
+        moveAmazon(player_id, x, y, num, direction, board, size, numOfPlayers, name, scoreBoard);
         board[x][y].artefact = 0;
     }
     else if(board[x][y].artefact == 2)
@@ -469,13 +473,13 @@ void usingArtifact(int player_id, int x, int y, Tile **board, int size)
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        shoot(2, x, y, num, direction, board, size);
+        shoot(2, x, y, num, direction, board, size, numOfPlayers, name, scoreBoard);
         board[x][y].artefact = 0;
     }
     
 }
 
-void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size) 
+void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers]) 
 {
 
     int valid = 1;
@@ -652,16 +656,18 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
     {
         board[x][y].occupation = 0;
         board[x + x_axis][y + y_axis].occupation = player_id;
+        scoreBoard[player_id].points += board[x + x_axis][y + y_axis].score;
+        board[x + x_axis][y + y_axis].score = 0;
         board[x + x_axis][y + y_axis].moved = 1;
         board[x][y].moved = 0;
-        printBoard(board , size);
+        printBoard(board, size, numOfPlayers, name, scoreBoard);
         //using artefact
-        usingArtifact(player_id, x + x_axis, y + y_axis, board, size);
+        usingArtifact(player_id, x + x_axis, y + y_axis, board, size, numOfPlayers, name, scoreBoard);
     }
     else
     {
         printf("Move is invalid. Make the move again.\n");
-        printBoard(board , size);
+        printBoard(board, size, numOfPlayers, name, scoreBoard);
         int num;
         char direction[15];
         printf("Number of tiles the amazon will move: ");
@@ -669,7 +675,7 @@ void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], T
         printf("Enter the direction: ");
         scanf("%s", &direction);
 
-        moveAmazon(player_id, x, y, num, direction, board, size);
+        moveAmazon(player_id, x, y, num, direction, board, size, numOfPlayers, name, scoreBoard);
     }
 
 }
@@ -696,10 +702,11 @@ int endGameCheck(int playerCanMove[], int players)
     return 0;
 }
 
-void printScore(int numOfPlayers, char **name[numOfPlayers][11], Score *scoreBoard[numOfPlayers]) {
+void printScore(int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers]) {
     for (int i = 0; i < numOfPlayers; i++) {
-        printf("%s : %d points\n", name[i], scoreBoard[i]);
+        printf("%s : %d points\n", name[i], scoreBoard[i].points);
     }
+    printf("\n");
 }
 
 void newMove(Tile **board, int size)
@@ -753,7 +760,12 @@ int main()
     Score *scoreBoard;
     scoreBoard = (Score*) malloc(numOfPlayers * sizeof(Score));
 
-    printBoard(board, size);
+    printBoard(board, size, numOfPlayers, name, scoreBoard);
+
+    //Resetting the Scoreboard
+    for (int i = 0; i < numOfPlayers; i++) {
+        scoreBoard[i].points = 0;
+    }
 
     //Placement Phase
     for (int i = 0; i < numOfAmazons; i++) 
@@ -762,7 +774,7 @@ int main()
         {
             printf("Turn of %s" , name[j]);
             placement(board , j+1, size);
-            printBoard(board , size);
+            printBoard(board, size, numOfPlayers, name, scoreBoard);
         }
     }
 
@@ -777,7 +789,7 @@ int main()
 
     while (endGameCheck(playersAvailableAmazons, numOfPlayers))
     {
-        for (int i = 0; i < numOfPlayers; i++) 
+        for (int i = 0; i < numOfPlayers; i++)
         {
             newMove(board, size);
             while (playersAvailableAmazons[i])
@@ -810,9 +822,9 @@ int main()
                 printf("Enter the direction: ");
                 scanf("%s", &direction);
 
-                moveAmazon(i+1, y, x, num, direction, board, size);
+                moveAmazon(i+1, y, x, num, direction, board, size, numOfPlayers, name, scoreBoard);
 
-                printBoard(board , size);
+                printBoard(board, size, numOfPlayers, name, scoreBoard);
 
                 for (int id = 0; id < numOfPlayers; id++)
                     playersAvailableAmazons[id] = availableAmazons(id+1, board, size);
