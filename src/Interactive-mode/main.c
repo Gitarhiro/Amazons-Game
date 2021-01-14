@@ -1,6 +1,12 @@
+#ifndef TAUCS_H
+#define TAUCS_H
 #include "assets.h"
 #include "movement.h"
 #include "placement.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#endif
 
 int main()
 {
