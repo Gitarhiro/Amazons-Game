@@ -1,4 +1,7 @@
-#include "movement.h"
+#ifndef TAUCS_H
+#define TAUCS_H
+#include "assets.h"
+#endif
 
 void moveAmazon(int player_id, int x, int y, int numOfTiles, char direction[], Tile **board, int size, int numOfPlayers, char name[numOfPlayers][11], Score scoreBoard[numOfPlayers]) 
 {
