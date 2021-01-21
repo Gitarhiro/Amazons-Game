@@ -61,7 +61,12 @@ int endGameCheck(int playerCanMove[], int players);
 //players                   -   number of players
 
 void newMove(Tile **board, int size);
+//newMove                       function that stores value of how many moves were made
+//tile board                -   structure of the board
+//int size                  -   dimension of the board, size x size
 
 void InputCoordinate(int *a , int range);
-
+//InputCoordinate               function that checks if imputed coordinate is in given range
+//*a                        -   coordinate
+//range                     -   specified range
 
