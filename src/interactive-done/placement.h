@@ -4,6 +4,7 @@
 #endif
 
 void randomizeBoard (Tile **board, int x);
+//randomizeBoard    function that randomizes the board, adds artefacts and score in random order and with random values specified in instructions
 //tile board    -   structure for game's board
 //int x         -   dimension of the square board
 
